@@ -10,8 +10,9 @@ Book.init(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
     },
     author: {

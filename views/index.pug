@@ -13,8 +13,12 @@ html(lang='en')
  body
    h2 Book Recommendations
    form(hx-post="/submit" hx-swap="beforeend" hx-target="#new-book" class="mb-3")
-     input(type="text" placeholder="Book Title" name="title" class="form-control mb-3")
-     input(type="text" placeholder="Book Author" name="author" class="form-control mb-3")
+     h5 Title
+     input(type="text" name="title" class="form-control mb-3")
+     h5 Author
+     input(type="text" name="author" class="form-control mb-3")
+     h5 Details
+     input(type="text" name="details" class="form-control mb-3")
 
      button(type="submit" class="btn btn-primary") Submit
    table
@@ -29,7 +33,7 @@ html(lang='en')
        each book in books
          tr
            td #{book.id}
-           td #{book.name}
+           td #{book.title}
            td #{book.author}
            td #{book.details}
            td

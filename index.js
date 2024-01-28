@@ -4,7 +4,7 @@ const sequelize = require("./app/model/dbconfig");
 const Book = require("./app/model/book");
 
 // automatically creating table on startup
-sequelize.sync({ force: false }).then(async () => {
+sequelize.sync({ force: true }).then(async () => {
   console.log("db is ready...");
 });
 
@@ -29,22 +29,24 @@ app.listen(PORT, () => {
 
 app.post("/submit", async (req, res) => {
     const book = {
-      name: req.body.title,
+      title: req.body.title,
       author: req.body.author,
+      details: req.body.details
     };
     await Book.create(book).then((x) => {
       // send id of recently created item
       return res.send(`<tr>
-      <td>${req.body.title}</td>
-      <td>${req.body.author}</td>
+      <td>${x.id}</td>
+      <td>${x.title}</td>
+      <td>${x.author}</td>
+      <td>${x.details}</td>
       <td>
           <button class="btn btn-primary"
-              hx-get="/get-edit-form/${x.null}">
+              hx-get="/get-edit-form/${x.id}">
               Edit Book
           </button>
-      </td>
-      <td>
-          <button hx-delete="/delete/${x.null}}"
+
+          <button hx-delete="/delete/${x.id}"
               class="btn btn-primary">
               Delete
           </button>
@@ -65,7 +67,7 @@ app.post("/submit", async (req, res) => {
     const id = req.params.id;
     await Book.findOne({ where: { id: id } }).then((book) => {
       return res.send(`<tr>
-      <td>${book.name}</td>
+      <td>${book.title}</td>
       <td>${book.author}</td>
       <td>
           <button class="btn btn-primary"
@@ -85,9 +87,10 @@ app.post("/submit", async (req, res) => {
   
   app.get("/get-edit-form/:id", async (req, res) => {
     const id = req.params.id;
+
     await Book.findOne({ where: { id: id } }).then((book) => {
       return res.send(`<tr hx-trigger='cancel' class='editing' hx-get="/get-book-row/${id}">
-      <td><input name="title" value="${book.name}"/></td>
+      <td><input name="title" value="${book.title}"/></td>
       <td><input name="author" value="${book.author}"/></td>
       <td>
         <button class="btn btn-primary" hx-get="/get-book-row/${id}">
@@ -107,7 +110,7 @@ app.post("/submit", async (req, res) => {
     await Book.findByPk(id).then((item) => {
       item
         .update({
-          name: req.body.title,
+          title: req.body.title,
           author: req.body.author,
         })
         .then(() => {
