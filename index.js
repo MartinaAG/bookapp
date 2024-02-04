@@ -67,15 +67,15 @@ app.post("/submit", async (req, res) => {
     const id = req.params.id;
     await Book.findOne({ where: { id: id } }).then((book) => {
       return res.send(`<tr>
+      <td>${id}</td>
       <td>${book.title}</td>
       <td>${book.author}</td>
+      <td>${book.details}</td>
       <td>
           <button class="btn btn-primary"
               hx-get="/get-edit-form/${id}">
               Edit Book
           </button>
-      </td>
-      <td>
           <button hx-delete="/delete/${id}"
               class="btn btn-primary">
               Delete
@@ -90,14 +90,16 @@ app.post("/submit", async (req, res) => {
 
     await Book.findOne({ where: { id: id } }).then((book) => {
       return res.send(`<tr hx-trigger='cancel' class='editing' hx-get="/get-book-row/${id}">
+      <td>${id}</td>
       <td><input name="title" value="${book.title}"/></td>
       <td><input name="author" value="${book.author}"/></td>
+      <td><input name="details" value="${book.details}"/></td>
       <td>
-        <button class="btn btn-primary" hx-get="/get-book-row/${id}">
-          Cancel
-        </button>
         <button class="btn btn-primary" hx-put="/update/${id}" hx-include="closest tr">
           Save
+        </button>
+        <button class="btn btn-primary" hx-get="/get-book-row/${id}">
+          Cancel
         </button>
       </td>
     </tr>`);
@@ -106,24 +108,26 @@ app.post("/submit", async (req, res) => {
   
   app.put("/update/:id", async (req, res) => {
     const id = req.params.id;
+
     // update book
     await Book.findByPk(id).then((item) => {
       item
         .update({
           title: req.body.title,
           author: req.body.author,
+          details: req.body.details
         })
         .then(() => {
           return res.send(`<tr>
+      <td>${id}</td>
       <td>${req.body.title}</td>
       <td>${req.body.author}</td>
+      <td>${req.body.details}</td>
       <td>
           <button class="btn btn-primary"
               hx-get="/get-edit-form/${id}">
               Edit Book
           </button>
-      </td>
-      <td>
           <button hx-delete="/delete/${id}"
               class="btn btn-primary">
               Delete
