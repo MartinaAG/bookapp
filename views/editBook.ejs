@@ -1,0 +1,14 @@
+<tr hx-trigger='cancel' class='editing' hx-get="/get-book-row/<%= id %>">
+    <td><%= id %></td>
+    <td><input name="title" value="<%= book.title %>"/></td>
+    <td><input name="author" value="<%= book.author %>"/></td>
+    <td><input name="details" value="<%= book.details %>"/></td>
+    <td>
+    <button class="btn btn-primary" hx-put="/update/<%= id %>" hx-include="closest tr">
+        Save
+    </button>
+    <button class="btn btn-primary" hx-get="/get-book-row/<%= id %>">
+        Cancel
+    </button>
+    </td>
+</tr>

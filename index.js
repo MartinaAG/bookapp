@@ -15,7 +15,11 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.set("view engine", "pug");
+const path = require('path')
+
+app.set('views', path.join(__dirname, 'views'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'ejs');
 
 app.get("/", async (req, res) => {
     const books = await Book.findAndCountAll();
@@ -28,112 +32,53 @@ app.listen(PORT, () => {
 });
 
 app.post("/submit", async (req, res) => {
-    const book = {
-      title: req.body.title,
-      author: req.body.author,
-      details: req.body.details
-    };
-    await Book.create(book).then((x) => {
-      // send id of recently created item
-      return res.send(`<tr>
-      <td>${x.id}</td>
-      <td>${x.title}</td>
-      <td>${x.author}</td>
-      <td>${x.details}</td>
-      <td>
-          <button class="btn btn-primary"
-              hx-get="/get-edit-form/${x.id}">
-              Edit Book
-          </button>
+  const book = {
+    title: req.body.title,
+    author: req.body.author,
+    details: req.body.details
+  };
 
-          <button hx-delete="/delete/${x.id}"
-              class="btn btn-primary">
-              Delete
-          </button>
-      </td>
-  </tr>`);
-    });
+  await Book.create(book).then((book) => {
+    return res.render('./submitBook', {book});
   });
+});
 
-  app.delete("/delete/:id", async (req, res) => {
-    const id = req.params.id;
-    await Book.findOne({ where: { id: id } }).then((book) => {
-      book.destroy();
-      return res.send("");
-    });
+app.delete("/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  await Book.findOne({ where: { id: id } }).then((book) => {
+    book.destroy();
+    return res.send("");
   });
+});
 
-  app.get("/get-book-row/:id", async (req, res) => {
-    const id = req.params.id;
-    await Book.findOne({ where: { id: id } }).then((book) => {
-      return res.send(`<tr>
-      <td>${id}</td>
-      <td>${book.title}</td>
-      <td>${book.author}</td>
-      <td>${book.details}</td>
-      <td>
-          <button class="btn btn-primary"
-              hx-get="/get-edit-form/${id}">
-              Edit Book
-          </button>
-          <button hx-delete="/delete/${id}"
-              class="btn btn-primary">
-              Delete
-          </button>
-      </td>
-  </tr>`);
-    });
+app.get("/get-book-row/:id", async (req, res) => {
+  const id = req.params.id;
+  await Book.findOne({ where: { id: id } }).then((book) => {
+    return res.render('./getBook', {book, id});
   });
+});
   
-  app.get("/get-edit-form/:id", async (req, res) => {
-    const id = req.params.id;
+app.get("/get-edit-form/:id", async (req, res) => {
+  const id = req.params.id;
 
-    await Book.findOne({ where: { id: id } }).then((book) => {
-      return res.send(`<tr hx-trigger='cancel' class='editing' hx-get="/get-book-row/${id}">
-      <td>${id}</td>
-      <td><input name="title" value="${book.title}"/></td>
-      <td><input name="author" value="${book.author}"/></td>
-      <td><input name="details" value="${book.details}"/></td>
-      <td>
-        <button class="btn btn-primary" hx-put="/update/${id}" hx-include="closest tr">
-          Save
-        </button>
-        <button class="btn btn-primary" hx-get="/get-book-row/${id}">
-          Cancel
-        </button>
-      </td>
-    </tr>`);
-    });
+  await Book.findOne({ where: { id: id } }).then((book) => {
+    return res.render('./editBook', {book, id});
   });
+});
   
-  app.put("/update/:id", async (req, res) => {
-    const id = req.params.id;
+app.put("/update/:id", async (req, res) => {
+  const id = req.params.id;
 
-    // update book
-    await Book.findByPk(id).then((item) => {
-      item
-        .update({
-          title: req.body.title,
-          author: req.body.author,
-          details: req.body.details
-        })
-        .then(() => {
-          return res.send(`<tr>
-      <td>${id}</td>
-      <td>${req.body.title}</td>
-      <td>${req.body.author}</td>
-      <td>${req.body.details}</td>
-      <td>
-          <button class="btn btn-primary"
-              hx-get="/get-edit-form/${id}">
-              Edit Book
-          </button>
-          <button hx-delete="/delete/${id}"
-              class="btn btn-primary">
-              Delete
-          </button>
-      </td>
-  </tr>`);
-        });
-    });
+  // update book
+  await Book.findByPk(id).then((item) => {
+    item
+      .update({
+        title: req.body.title,
+        author: req.body.author,
+        details: req.body.details
+      })
+      .then(() => {
+        return res.render('./updateBook', {item, id});
+      });
   });
+});

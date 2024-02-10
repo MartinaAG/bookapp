@@ -1,0 +1,16 @@
+<tr>
+    <td><%= id %></td>
+    <td><%= book.title %></td>
+    <td><%= book.author %></td>
+    <td><%= book.details %></td>
+    <td>
+        <button class="btn btn-primary"
+            hx-get="/get-edit-form/<%= id %>">
+            Edit Book
+        </button>
+        <button hx-delete="/delete/<%= id %>"
+            class="btn btn-primary">
+            Delete
+        </button>
+    </td>
+</tr>
