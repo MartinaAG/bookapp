@@ -16,7 +16,7 @@
 </head>
 <body>
     <h2>Book Recommendations</h2>
-    <form hx-post="/submit" hx-swap="beforeend" hx-target="#new-book" class="mb-3">
+    <form hx-post="/submit" hx-swap="beforeend" hx-target="#new-book" name="addBookForm" class="mb-3">
         <h5>Title</h5>
         <input type="text" name="title" class="form-control mb-3">
         <h5>Author</h5>
@@ -28,7 +28,6 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Book Title</th>
                 <th>Book Author</th>
                 <th>Details</th>
@@ -40,7 +39,11 @@
         </tbody>
     </table>
     <script>
-        // JavaScript logic can be added here if necessary
+        function clearForm() {
+            document.forms['addBookForm']
+                .querySelectorAll('input')
+                .forEach((node) => node.value = '')
+        }
     </script>
 </body>
 </html>
